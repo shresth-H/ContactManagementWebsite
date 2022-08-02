@@ -1,88 +1,193 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ContactService } from "../../../services/ContactService";
+import Spinner from "../../Spinner/Spinner";
 
 let ContactList = () => {
-    return (
-        <React.Fragment>
-            <section className="contact-search p-3">
-                <div className="container">
-                    <div className="grid">
-                        <div className="row">
-                            <div className="col">
-                                <p className="h3">
-                                    Contact Manager 
-                                    <Link to={'/contacts/add'} className="btn btn-primary ms-2">
-                                        <i className="fa fa-plus-circle me-2"/>
-                                        New
-                                    </Link>
-                                </p>
-                                <p className="fast-italic">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis natus error nihil exercitationem, porro facere, iure eos excepturi eum voluptatum libero totam culpa reiciendis maiores, vero numquam omnis? Ipsam, eum.</p>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-6">
-                                <form className="row">
-                                    <div className="col">
-                                    <div className="mb-2">
-                                        <input type="text" className="form-control" placeholder="Search Names"/>
-                                    </div>
-                                    </div>
-                                    <div className="col">
-                                    <div className="mb-2">
-                                        <input type="submit" className="btn btn-outline-dark" value="Search"/>
-                                    </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section className="contact-list">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row align-items-center d-flex justify-content-around">
-                                    <div className="col-md-4">
-                                        <img src="https://th.bing.com/th/id/OIP.8Di5Xe-0ty58fzXIdk_2OQHaFj?w=239&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="" className="img-fluid contact-img"/>
-                                    </div>
-                                    <div className="col-md-7">
-                                        <ul className="list-group">
-                                            <li className="list-group-item list-group-item-action">
-                                                Name : <span className="fw-bold">Rajan</span>
-                                            </li>
-                                            <li className="list-group-item list-group-item-action">
-                                                Mobile : <span className="fw-bold">4544564666</span>
-                                            </li>
-                                            <li className="list-group-item list-group-item-action">
-                                                Email : <span className="fw-bold">rajan@gmail.com</span>
-                                            </li>
-                                        </ul>
+  let [query, setQuery] = useState({
+    text: "",
+  });
 
-                                    </div>
-                                    <div className="col-md-1 d-flex flex-column align-items-center">
-                                        <Link to={`/contacts/view/:contactId`} className="btn btn-warning my-1">
-                                            <i className="fa fa-eye"/>
-                                        </Link>
-                                        <Link to={`/contacts/edit/:contactId`} className="btn btn-primary my-1">
-                                            <i className="fa fa-pen"/>
-                                        </Link>
-                                        <button className="btn btn-danger my-1">
-                                            <i className="fa fa-trash"/>
-                                        </button>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  let [state, setState] = useState({
+    loading: false,
+    contacts: [],
+    filteredContacts: [],
+    errorMessage: "",
+  });
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setState({ ...state, loading: true });
+        let response = await ContactService.getAllContacts();
+        setState({
+          ...state,
+          loading: false,
+          contacts: response.data,
+          filteredContacts: response.data,
+        });
+      } catch (error) {
+        setState({
+          ...state,
+          loading: false,
+          errorMessage: error.message,
+        });
+      }
+    }
+    fetchData();
+  }, []);
+
+  let clickDelete = async (contactId) => {
+    try {
+      let response = await ContactService.deleteContact(contactId);
+      if (response) {
+        setState({ ...state, loading: true });
+        let response = await ContactService.getAllContacts();
+        setState({
+          ...state,
+          loading: false,
+          contacts: response.data,
+          filteredContacts: response.data,
+        });
+      }
+    } catch (error) {
+      setState({
+        ...state,
+        loading: false,
+        errorMessage: error.message,
+      });
+    }
+  };
+
+  let searchContacts = (event) => {
+    setQuery({ ...query, text: event.target.value });
+    let theContacts = state.contacts.filter((contact) => {
+      return contact.name
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+
+    setState({
+      ...state,
+      filteredContacts: theContacts,
+    });
+  };
+
+  let { loading, contacts, filteredContacts, errorMessage } = state;
+
+  return (
+    <React.Fragment>
+      <section className="contact-search p-3">
+        <div className="container">
+            <div className="row">
+                <p className="my-2">
+                  <Link to={"/contacts/add"} className="btn btn-primary ms-2">
+                    <i className="fa fa-plus-circle me-2" />
+                    New Contact
+                  </Link>
+                </p>
+            </div>
+            <div className="container">
+                <form className="d-flex justify-content-center">
+                    <div className="mx-2">
+                      <input
+                        name="text"
+                        value={query.text}
+                        onChange={searchContacts}
+                        type="text"
+                        className="form-control"
+                        placeholder="Search Names"
+                      />
                     </div>
-                </div>
-            </section>
+                    <div className="mx-2">
+                      <input
+                        type="submit"
+                        className="btn btn-outline-dark"
+                        value="Search"
+                      />
+                    </div>
+                </form>
+              </div>
+            </div>
+      </section>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <React.Fragment>
+          <section>
+            <div className="container my-5">
+              <div className="shadow-10 rounded-3 overflow-hidden">
+                <table className="table align-middle mb-0">
+                  <thead>
+                    <tr className="text-center">
+                      <th></th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Contact</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  {filteredContacts.length > 0 &&
+                    filteredContacts.map((contact) => {
+                      return (
+                        <tbody key={contact.id}>
+                          <tr className="shadow-3 text-center">
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <img
+                                  src={contact.photo}
+                                  alt=""
+                                  style={{ width: "45px", height: "45px" }}
+                                  className="rounded-circle"
+                                />
+                              </div>
+                            </td>
+                            <td>
+                            <div className="ms-3">
+                              <p className="mb-1">{contact.name}</p>
+                            </div>
+                            </td>
+                            <td>
+                              <p className="text-muted mb-0 ">
+                                {contact.email}
+                              </p>
+                            </td>
+                            <td>
+                              <span className="">{contact.mobile}</span>
+                            </td>
+                            <td>
+                              <Link
+                                to={`/contacts/view/${contact.id}`}
+                                className="btn btn-sm btn-warning btn-rounded mx-2"
+                              >
+                                View
+                              </Link>
+                              <Link
+                                to={`/contacts/edit/${contact.id}`}
+                                className="btn btn-sm btn-primary btn-rounded mx-2"
+                              >
+                                Edit
+                              </Link>
+                              <button
+                                onClick={() => clickDelete(contact.id)}
+                                className="btn btn-sm btn-danger btn-rounded mx-2"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      );
+                    })}
+                </table>
+              </div>
+            </div>
+          </section>
         </React.Fragment>
-           
-    );
-}
+      )}
+    </React.Fragment>
+  );
+};
 
 export default ContactList;

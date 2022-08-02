@@ -1,0 +1,38 @@
+{
+  "contacts": [
+    {
+      "id": "AhtkmnkhA126",
+      "name": "Rajan",
+      "photo": "https://th.bing.com/th/id/OIP.8Di5Xe-0ty58fzXIdk_2OQHaFj?w=239&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+      "mobile": "6369562526",
+      "email": "rajan@gmail.com",
+      "title": "Software Engineer",
+      "company": "HCL Technologies",
+      "groupId": "3"
+    },
+    {
+      "name": "shrey",
+      "photo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxmZWmQVnve0WBKmeEFF54IoTfs17lDNwOQLdws8xRscuKga4Hw-9C-LM-AzJVgYEe4Fs&usqp=CAU",
+      "mobile": "8765869700",
+      "email": "sjd@gmail.com",
+      "company": "HP",
+      "title": "System Engineer",
+      "groupId": "1",
+      "id": "KwGWNBP"
+    }
+  ],
+  "groups": [
+    {
+      "id": "1",
+      "name": "Colleague"
+    },
+    {
+      "id": "2",
+      "name": "Friend"
+    },
+    {
+      "id": "3",
+      "name": "Family"
+    }
+  ]
+}
