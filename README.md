@@ -1,8 +1,11 @@
-Contact Management System
+1- gitlone
 
-ReactJs - UI
-Bootstrap - Frontend Desinging
-JSON Server - Backend Server
-Axios - Backend API's
+2- install npm
 
+3- change to server directory
 
+4- start JSON server - ### ( npm start )
+
+5- change to root directory
+
+6- ### ( npm start )
