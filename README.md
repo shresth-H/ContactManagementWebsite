@@ -1,4 +1,4 @@
-1- gitlone
+1- gitclone
 
 2- install npm
 
